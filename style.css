@@ -56,6 +56,12 @@ body {
             width: 290px;
             height: 42px;
         }
+       #field-block-4 {
+            top: 560px;       
+            left: 32px;
+            width: 40px;
+            height: 40px;
+        }
 
         /* 
            3. INVISIBLE TEXT OVERLAYS
