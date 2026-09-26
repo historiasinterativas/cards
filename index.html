@@ -14,6 +14,44 @@
     <script src="https://cloudflare.com"></script>
 </head>
 <body>
-just a test
+ <!-- Main HTML form wrapper -->
+    <form id="myForm" action="https://your-api-endpoint.com" method="POST">
+        
+        <!-- Target module captured for transparent generation -->
+        <div id="captureArea" class="form-container">
+            
+            <!-- Box 1: Dropdown Selection -->
+            <div id="field-block-1" class="absolute-field">
+                <select id="category" name="category" class="invisible-input" required>
+                    <option value="" disabled selected hidden></option> 
+                    <option value="technology">Technology</option>
+                    <option value="finance">Finance</option>
+                    <option value="healthcare">Healthcare</option>
+                </select>
+            </div>
+
+            <!-- Box 2: Dropdown Selection -->
+            <div id="field-block-2" class="absolute-field">
+                <select id="priority" name="priority" class="invisible-input" required>
+                    <option value="" disabled selected hidden></option> 
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+
+            <!-- Box 3: Text Input -->
+            <div id="field-block-3" class="absolute-field">
+                <input type="text" id="username" name="username" class="invisible-input" required>
+            </div>
+
+        </div>
+
+        <!-- The control button is linked seamlessly to the HTML form structure above -->
+        <div class="control-panel">
+            <button type="submit" id="submitBtn">Submit & Download Form</button>
+        </div>
+    </form>
+
 </body>
 </html>
