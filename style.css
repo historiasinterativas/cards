@@ -130,7 +130,7 @@ body {
             text-align: center;
         }
 
-        #submitBtn {
+        #download-btn {
             font-family: 'Almendra SC', serif;
             padding: 12px 24px;
             border: none;
@@ -145,11 +145,11 @@ body {
             width: 100%;
         }
 
-        #submitBtn:hover {
+        #download-btn:hover {
             background-color: darkblue;
         }
 
-        #submitBtn:disabled {
+        #download-btn:disabled {
             background-color: #999;
             cursor: not-allowed;
         }
