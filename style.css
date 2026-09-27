@@ -40,6 +40,9 @@ body {
             left: 115px;
             width: 180px;
             height: 42px;
+            padding: 8px 12px;        /* Explicit padding keeps text centered */
+            line-height: 1.2;         /* Explicit line height prevents canvas drifting */
+            vertical-align: middle;
         }
          #combat {
             top: 420px;       
