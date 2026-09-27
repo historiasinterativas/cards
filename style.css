@@ -22,7 +22,7 @@ body {
             padding: 0;         
             box-sizing: border-box;
             
-            background-image: url('https://elianebettocchi.github.io/terranova/perfis/cards/0.png');
+            background-image: url('0.png');
             background-size: 100% 100%; 
             background-position: center;
             background-repeat: no-repeat;
@@ -35,28 +35,57 @@ body {
             position: absolute;
             box-sizing: border-box;
         }
-
-        #field-block-1 {
-            top: 180px;       
-            left: 32px;       
-            width: 290px;      
-            height: 42px;      
-        }
-
-        #field-block-2 {
-            top: 270px;       
-            left: 32px;
-            width: 290px;
+        #people {
+            top: 287px;       
+            left: 115px;
+            width: 180px;
             height: 42px;
         }
-
-        #field-block-3 {
-            top: 360px;       
-            left: 32px;
-            width: 290px;
+         #combat {
+            top: 420px;       
+            left: 0px;       
+            width: 354px;      
+            height: 42px;
+            text-indent: 25%;      
+        }
+        #devotion {
+            top: 537px;       
+            left: 165px;
+            width: 180px;
             height: 42px;
         }
-       #field-block-4 {
+        #valor {
+            top: 560px;       
+            left: 90px;
+            width: 200px;
+            height: 42px;
+        }
+        #desvalor {
+            top: 585px;       
+            left: 90px;
+            width: 200px;
+            height: 42px;
+        }
+        #nome {
+            top: 265px;       
+            left: 115px;
+            width: 200px;
+            height: 42px;
+        }
+        #place {
+            top: 310px;       
+            left: 115px;
+            width: 200px;
+            height: 42px;
+        }
+        #other {
+            top: 470px;       
+            left: 0px;
+            width: 354px;
+            height: 42px;
+            text-align: center;
+        }
+        #range {
             top: 575px;       
             left: 300px;
             width: 15px;
@@ -82,7 +111,7 @@ body {
 
         .invisible-input option {
             color: #333300;
-            background-color: #cfc8b0; 
+            background-color: #ffffff; 
         }
 
         select.invisible-input {
@@ -109,18 +138,18 @@ body {
             cursor: pointer;
             font-weight: bold;
             font-size: 14px;
-            background-color: #10B981;
+            background-color: #666;
             color: white;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            box-shadow: 0 4px 12px rgba(73, 73, 73, 0.2);
             transition: transform 0.1s, background-color 0.2s;
             width: 100%;
         }
 
         #submitBtn:hover {
-            background-color: #059669;
+            background-color: darkblue;
         }
 
         #submitBtn:disabled {
-            background-color: #4b5563;
+            background-color: #999;
             cursor: not-allowed;
         }
