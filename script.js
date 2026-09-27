@@ -10,77 +10,50 @@ document.addEventListener('DOMContentLoaded', function() {
                 return; 
             }
 
-            // Capture the exact positions of all live elements BEFORE cloning
-            const liveInputsData = Array.from(formElement.querySelectorAll('input, textarea')).map(input => {
-                return {
-                    value: input.value || input.placeholder || '',
-                    // Get position relative to the #captureArea container instead of the whole page
-                    rect: {
-                        top: input.offsetTop,
-                        left: input.offsetLeft,
-                        width: input.offsetWidth,
-                        height: input.offsetHeight
-                    },
-                    styles: {
-                        padding: window.getComputedStyle(input).padding,
-                        fontSize: window.getComputedStyle(input).fontSize,
-                        fontFamily: window.getComputedStyle(input).fontFamily,
-                        color: window.getComputedStyle(input).color,
-                        border: window.getComputedStyle(input).border,
-                        borderRadius: window.getComputedStyle(input).borderRadius,
-                        backgroundColor: window.getComputedStyle(input).backgroundColor,
-                        textAlign: window.getComputedStyle(input).textAlign
-                    }
-                };
-            });
-
             html2canvas(formElement, {
-                scale: 2,
+                scale: 2,         // High quality
                 useCORS: true,
+                logging: false,    // Cleans up console
                 onclone: (clonedDoc) => {
                     const clonedCaptureArea = clonedDoc.getElementById('captureArea');
                     if (!clonedCaptureArea) return;
 
-                    // 1. Hide the original buggy elements inside the clone completely
-                    const clonedInputs = clonedCaptureArea.querySelectorAll('input, textarea');
-                    clonedInputs.forEach(input => {
-                        input.style.opacity = '0'; // Keeps layout structure intact but hides them
-                    });
+                    // Find all inputs inside the snapshot area
+                    const inputs = clonedCaptureArea.querySelectorAll('input, textarea');
 
-                    // Ensure the cloned container can hold absolute positioned child mirrors
-                    const originalPosition = window.getComputedStyle(formElement).position;
-                    if (originalPosition === 'static') {
-                        clonedCaptureArea.style.position = 'relative';
-                    }
-
-                    // 2. Overlay pixel-perfect text blocks exactly where the inputs were
-                    liveInputsData.forEach(data => {
+                    inputs.forEach(input => {
+                        // Create a flat block element instead of a flex container
                         const textMirror = clonedDoc.createElement('div');
-                        textMirror.textContent = data.value;
                         
-                        // Enforce absolute geometry matching the live positions exactly
-                        textMirror.style.position = 'absolute';
-                        textMirror.style.top = data.rect.top + 'px';
-                        textMirror.style.left = data.rect.left + 'px';
-                        textMirror.style.width = data.rect.width + 'px';
-                        textMirror.style.height = data.rect.height + 'px';
+                        // Grab the text (fallback to placeholder text if empty)
+                        textMirror.textContent = input.value || input.placeholder || '';
                         
-                        // Match visual aesthetics
+                        // Extract exactly how the browser evaluates styles right now
+                        const computed = window.getComputedStyle(input);
+                        
+                        // Apply layout and typography precisely
                         textMirror.style.boxSizing = 'border-box';
-                        textMirror.style.padding = data.styles.padding;
-                        textMirror.style.fontSize = data.styles.fontSize;
-                        textMirror.style.fontFamily = data.styles.fontFamily;
-                        textMirror.style.color = data.styles.color;
-                        textMirror.style.border = data.styles.border;
-                        textMirror.style.borderRadius = data.styles.borderRadius;
-                        textMirror.style.backgroundColor = data.styles.backgroundColor;
+                        textMirror.style.width = computed.width;
+                        textMirror.style.height = computed.height;
+                        textMirror.style.fontSize = computed.fontSize;
+                        textMirror.style.fontFamily = computed.fontFamily;
+                        textMirror.style.fontWeight = computed.fontWeight;
+                        textMirror.style.color = input.value ? computed.color : '#a9a9a9'; // Dim placeholder text if empty
+                        textMirror.style.textAlign = computed.textAlign;
                         
-                        // Lock vertical text centering using flexbox on a flat div
-                        textMirror.style.display = 'flex';
-                        textMirror.style.alignItems = 'center';
-                        textMirror.style.justifyContent = data.styles.textAlign === 'center' ? 'center' : 'flex-start';
+                        // Core Fix: Use identical line-height and height to force middle vertical centering natively
+                        textMirror.style.lineHeight = computed.height; 
+                        textMirror.style.paddingLeft = computed.paddingLeft;
+                        textMirror.style.paddingRight = computed.paddingRight;
+                        
+                        // Visual boxes matching your inputs
+                        textMirror.style.border = computed.border;
+                        textMirror.style.borderRadius = computed.borderRadius;
+                        textMirror.style.backgroundColor = computed.backgroundColor;
 
-                        clonedCaptureArea.appendChild(textMirror);
+                        // Clean replacement
+                        input.style.display = 'none';
+                        input.parentNode.insertBefore(textMirror, input);
                     });
                 }
             }).then(canvas => {
