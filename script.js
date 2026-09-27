@@ -1,57 +1,89 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. Grab the download button
     const downloadBtn = document.getElementById('download-btn');
 
     if (downloadBtn) {
         downloadBtn.addEventListener('click', function () {
-            // 2. Locate your live capture element on the page
             const formElement = document.getElementById('captureArea'); 
 
-            // 3. Safety Check: Stop immediately if it's missing
             if (!formElement) {
                 console.error("Error: Could not find an element with id='captureArea' on this page.");
-                alert("Capture area not found!");
                 return; 
             }
 
-            // 4. Run html2canvas on the live element
+            // Capture the exact positions of all live elements BEFORE cloning
+            const liveInputsData = Array.from(formElement.querySelectorAll('input, textarea')).map(input => {
+                return {
+                    value: input.value || input.placeholder || '',
+                    // Get position relative to the #captureArea container instead of the whole page
+                    rect: {
+                        top: input.offsetTop,
+                        left: input.offsetLeft,
+                        width: input.offsetWidth,
+                        height: input.offsetHeight
+                    },
+                    styles: {
+                        padding: window.getComputedStyle(input).padding,
+                        fontSize: window.getComputedStyle(input).fontSize,
+                        fontFamily: window.getComputedStyle(input).fontFamily,
+                        color: window.getComputedStyle(input).color,
+                        border: window.getComputedStyle(input).border,
+                        borderRadius: window.getComputedStyle(input).borderRadius,
+                        backgroundColor: window.getComputedStyle(input).backgroundColor,
+                        textAlign: window.getComputedStyle(input).textAlign
+                    }
+                };
+            });
+
             html2canvas(formElement, {
                 scale: 2,
                 useCORS: true,
                 onclone: (clonedDoc) => {
-                    // Inside the clone, locate the cloned version of your container
                     const clonedCaptureArea = clonedDoc.getElementById('captureArea');
                     if (!clonedCaptureArea) return;
 
-                    // Find all input fields inside the cloned area
-                    const inputs = clonedCaptureArea.querySelectorAll('input, textarea');
+                    // 1. Hide the original buggy elements inside the clone completely
+                    const clonedInputs = clonedCaptureArea.querySelectorAll('input, textarea');
+                    clonedInputs.forEach(input => {
+                        input.style.opacity = '0'; // Keeps layout structure intact but hides them
+                    });
 
-                    inputs.forEach(input => {
-                        // Create a clean text mirror span to perfectly align text
-                        const textMirror = clonedDoc.createElement('span');
-                        textMirror.textContent = input.value || input.placeholder || '';
+                    // Ensure the cloned container can hold absolute positioned child mirrors
+                    const originalPosition = window.getComputedStyle(formElement).position;
+                    if (originalPosition === 'static') {
+                        clonedCaptureArea.style.position = 'relative';
+                    }
+
+                    // 2. Overlay pixel-perfect text blocks exactly where the inputs were
+                    liveInputsData.forEach(data => {
+                        const textMirror = clonedDoc.createElement('div');
+                        textMirror.textContent = data.value;
                         
-                        // Mirror the exact computed layout sizes and styles
+                        // Enforce absolute geometry matching the live positions exactly
+                        textMirror.style.position = 'absolute';
+                        textMirror.style.top = data.rect.top + 'px';
+                        textMirror.style.left = data.rect.left + 'px';
+                        textMirror.style.width = data.rect.width + 'px';
+                        textMirror.style.height = data.rect.height + 'px';
+                        
+                        // Match visual aesthetics
+                        textMirror.style.boxSizing = 'border-box';
+                        textMirror.style.padding = data.styles.padding;
+                        textMirror.style.fontSize = data.styles.fontSize;
+                        textMirror.style.fontFamily = data.styles.fontFamily;
+                        textMirror.style.color = data.styles.color;
+                        textMirror.style.border = data.styles.border;
+                        textMirror.style.borderRadius = data.styles.borderRadius;
+                        textMirror.style.backgroundColor = data.styles.backgroundColor;
+                        
+                        // Lock vertical text centering using flexbox on a flat div
                         textMirror.style.display = 'flex';
                         textMirror.style.alignItems = 'center';
-                        textMirror.style.width = window.getComputedStyle(input).width;
-                        textMirror.style.height = window.getComputedStyle(input).height;
-                        textMirror.style.padding = window.getComputedStyle(input).padding;
-                        textMirror.style.boxSizing = 'border-box';
-                        textMirror.style.fontSize = window.getComputedStyle(input).fontSize;
-                        textMirror.style.fontFamily = window.getComputedStyle(input).fontFamily;
-                        textMirror.style.color = window.getComputedStyle(input).color;
-                        textMirror.style.border = window.getComputedStyle(input).border;
-                        textMirror.style.borderRadius = window.getComputedStyle(input).borderRadius;
-                        textMirror.style.backgroundColor = window.getComputedStyle(input).backgroundColor;
+                        textMirror.style.justifyContent = data.styles.textAlign === 'center' ? 'center' : 'flex-start';
 
-                        // Hide the shifting input field and replace it with the flat text mirror
-                        input.style.display = 'none';
-                        input.parentNode.insertBefore(textMirror, input);
+                        clonedCaptureArea.appendChild(textMirror);
                     });
                 }
             }).then(canvas => {
-                // 5. Convert to image data and force the local file download
                 const imageURI = canvas.toDataURL('image/png');
                 const link = document.createElement('a');
                 link.download = 'user-form.png';
@@ -64,7 +96,5 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
         });
-    } else {
-        console.error("Could not find #download-btn in the HTML.");
     }
 });
