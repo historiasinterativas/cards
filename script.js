@@ -12,58 +12,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert("The capture area could not be found on the page.");
                 return; 
             }
-
-            // Run html2canvas
+                // Run html2canvas
             html2canvas(formElement, {
-    scale: 2, // High resolution
-    useCORS: true,
-    onclone: (clonedDoc) => {
-        // 1. Find all inputs inside the cloned version of your capture area
-        const clonedCaptureArea = clonedDoc.getElementById('captureArea');
-        const inputs = clonedCaptureArea.querySelectorAll('input, textarea');
+                scale: 2,
+                useCORS: true,
+                onclone: (clonedDoc) => {
+                    const clonedCaptureArea = clonedDoc.getElementById('captureArea');
+                    const inputs = clonedCaptureArea.querySelectorAll('input, textarea');
 
-        inputs.forEach(input => {
-            // 2. Create a temporary span element to hold the text
-            const textMirror = clonedDoc.createElement('span');
-            
-            // Copy the user's typed text (or placeholder if empty)
-            textMirror.textContent = input.value || input.placeholder || '';
-            
-            // 3. Copy the exact styling/dimensions from the input so layout doesn't break
-            textMirror.style.display = 'inline-block';
-            textMirror.style.width = window.getComputedStyle(input).width;
-            textMirror.style.height = window.getComputedStyle(input).height;
-            textMirror.style.padding = window.getComputedStyle(input).padding;
-            textMirror.style.boxSizing = 'border-box';
-            textMirror.style.fontSize = window.getComputedStyle(input).fontSize;
-            textMirror.style.fontFamily = window.getComputedStyle(input).fontFamily;
-            textMirror.style.color = window.getComputedStyle(input).color;
-            
-            // Center the text vertically to completely eliminate the drift
-            textMirror.style.display = 'flex';
-            textMirror.style.alignItems = 'center';
+                    inputs.forEach(input => {
+                        const textMirror = clonedDoc.createElement('span');
+                        textMirror.textContent = input.value || input.placeholder || '';
+                        textMirror.style.display = 'inline-block';
+                        textMirror.style.width = window.getComputedStyle(input).width;
+                        textMirror.style.height = window.getComputedStyle(input).height;
+                        textMirror.style.padding = window.getComputedStyle(input).padding;
+                        textMirror.style.boxSizing = 'border-box';
+                        textMirror.style.fontSize = window.getComputedStyle(input).fontSize;
+                        textMirror.style.fontFamily = window.getComputedStyle(input).fontFamily;
+                        textMirror.style.color = window.getComputedStyle(input).color;
+                        textMirror.style.display = 'flex';
+                        textMirror.style.alignItems = 'center';
+                        textMirror.style.border = window.getComputedStyle(input).border;
+                        textMirror.style.borderRadius = window.getComputedStyle(input).borderRadius;
+                        textMirror.style.backgroundColor = window.getComputedStyle(input).backgroundColor;
 
-            // Optional: Copy the border/background if you want it to still look like a field box
-            textMirror.style.border = window.getComputedStyle(input).border;
-            textMirror.style.borderRadius = window.getComputedStyle(input).borderRadius;
-            textMirror.style.backgroundColor = window.getComputedStyle(input).backgroundColor;
-
-            // 4. Swap them: Hide the buggy input field and insert the perfect text mirror
-            input.style.display = 'none';
-            input.parentNode.insertBefore(textMirror, input);
+                        input.style.display = 'none';
+                        input.parentNode.insertBefore(textMirror, input);
+                    });
+                }
+            }).then(canvas => { // ✅ Added the missing }) closure right before the .then loop here
+                const imageURI = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = 'user-form.png';
+                link.href = imageURI;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }).catch(err => {
+                console.error("html2canvas error:", err);
+            });
+            
         });
-    }
-}).then(canvas => {
-    const imageURI = canvas.toDataURL('image/png');
-    const link = document.createElement('a');
-    link.download = 'user-form.png';
-    link.href = imageURI;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}).catch(err => {
-    console.error("html2canvas error:", err);
-});
     } else {
         console.error("Could not find #download-btn in the HTML.");
     }
