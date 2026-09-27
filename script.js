@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 2. NOW it is safe to look for your button
     const downloadBtn = document.getElementById('download-btn');
-    const formElement = document.getElementById('form-container');
+    const formElement = document.getElementById('captureArea');
 
     downloadBtn.addEventListener('click', function () {
         html2canvas(formElement, {
